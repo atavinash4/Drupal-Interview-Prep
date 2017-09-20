@@ -1,0 +1,172 @@
+https://mediatemple.net/community/products/dv/204403864/export-and-import-mysql-databases
+
+
+Overview
+This article will show you how to export a copy of your MySQL 
+database, and how to import an SQL database backup file to your database
+ server. This is useful for making personal backups of your site, and 
+for importing backups from other servers.
+
+
+
+Instructions
+Method 1 - phpMyAdmin
+Export
+Select your database from the list on the left.
+
+
+Click on "Export" from the top set of tabs.
+
+
+Select the tables from the list that you would like to back up. If you want to back up the entire database, click "Select All."
+
+
+Make sure both the "Structure" and "Data" boxes are selected on the right. They should be, by default.
+In the Structure section, check the "Add DROP TABLE / DROP VIEW" box 
+if you want this export to be able to replace existing tables of the 
+same name. If you want to merge this backup with another database, do 
+not select this.
+
+
+
+Check the "Save as file" box. Also select a compression option (such
+ as "gzipped") if you want to compress the backup before downloading it 
+from the server.
+
+
+Click the "Go" button, and, at the prompt, save the file to your local computer.
+
+
+
+Import
+Make sure the database you need has already been created. If it has not, please first create the database:
+How do I create a database?
+
+CAUTION:
+
+If you import a backup file to a database that already has content, it will replace the existing content.
+
+
+
+In phpMyAdmin, select your database from the list on the left.
+
+
+Click on "Import" from the top set of tabs.
+
+
+Click on the "Browse" button next to "Location of the text file."
+
+
+Browse to your local SQL file and click "Open." If it is a zipped file, please unzip the file first.Click the "Go" button at the bottom. Wait while your database imports. Depending on the size, this can take a few minutes.
+
+
+You should get a message like this:
+
+Import has been successfully finished, X queries executed.
+
+If you instead receive an error, please try the command line method below.
+
+
+Method 2 - command line
+This method works for all database sizes, including very large ones.
+
+You must be able to log into your server with SSH.
+
+Connecting via SSH to your server
+Export
+Log into your server via SSH.Use the command cd to navigate to a directory where your user has write access. Example:
+cd /var/www/vhosts/example.com/httpdocs
+
+Export the database by executing the following command:
+mysqldump --add-drop-table -u admin -p`cat /etc/psa/.psa.shadow` dbname > dbname.sql
+
+Once you execute this command, you will be prompted for your database
+ password. Type in the password and hit enter. Your database will now 
+start exporting. When it is done, you will see the command prompt again.
+ If it is a large database, this may take a few minutes.
+
+
+NOTE:
+
+The following variables need to be replaced with your own information:
+
+-u admin specifies the database username.Username is "admin" and the password is a hashed version of your Plesk admin password.dbname is the name of the database you are trying to export.dbname.sql is the name you want to give your backup file, and can be whatever you want.Omit the --add-drop-table 
+argument if you plan to merge this backup with an existing database when
+ you import it. This option means the backup will totally replace the 
+old database when it is imported.
+
+
+You can now download the resulting SQL file. Connect to your server with FTP, navigate to the directory where you created the dump file, and download it.Remove the SQL file from your web-accessible directory, if you 
+created it in a public folder. Otherwise, anyone can download it from 
+the web.
+If you get an error that looks like this:
+
+Got Error: 1045: Access denied for user 'admin@example.com' (using password: YES) when trying to connect
+
+This means you have entered an incorrect password. Please retype it carefully, or reset your password in the AccountCenter. See How can I change my Plesk admin password? for instructions.
+
+Import
+Use FTP to upload your SQL file to your server. You can upload it to
+ your default FTP directory. See Step 1 in the "Export" instructions 
+above for another suggestion. Alternately, you can use scp to upload your file via SSH.Log into your server via SSH.Use the command cd to 
+navigate into the directory where you uploaded your backup file in Step 
+1. If you uploaded the backup into your public htttpdocs directory, go 
+here:
+cd /var/www/vhosts/example.com/httpdocs/
+
+Import the database by executing the following command:
+mysql -u admin -p`cat /etc/psa/.psa.shadow` dbname < dbname.sql
+
+OR:
+
+mysql -u admin -p`cat /etc/psa/.psa.shadow` dbname -e 'source dbname.sql'
+
+Once you 
+execute this command, you will be prompted for your database password. 
+Type it in and hit enter. Your database will now import. It may take a 
+few minutes if you have a large database. When the import is done, you 
+will be returned to the command prompt.
+
+
+
+NOTE:
+
+Variables are the same as in Step 3 from the Export section above. 
+Please check Step 3 in the "Export" section to make sure you are 
+correctly replacing the example code with your own information.dbname.sql is the actual name of your SQL file.If you have a gzipped backup of your database, you can use this line instead:
+gunzip < dbname.gz | mysql -u admin -p`cat /etc/psa/.psa.shadow` dbname
+
+You can 
+enter in your own username, database name, and backup file name, as 
+before. dbname.gz is the name of your gzipped backup file. Use "unzip" 
+instead of "gunzip" for zipped files.
+
+
+
+Remove the SQL file from your web-accessible directory, if you 
+uploaded it to a public folder. Otherwise, anyone can download it from 
+the web.
+If you get an error that looks like this:
+
+Got Error: 1045: Access denied for user 'admin@example.com' (using password: YES) when trying to connect
+
+You have entered an incorrect password. Please retype it carefully, or reset your password in the AccountCenter. See How can I change my Plesk admin password? for instructions.
+
+If you get 
+an SQL error during the import, you can force it to finish by adding 
+"-f" to the command, which stands for "force." For example:
+
+mysql -f -u admin -p`cat /etc/psa/.psa.shadow` dbname < dbname.sql
+
+This can 
+help you finish an import if you have a few corrupt tables, but need to 
+get the database as a whole imported before you do anything else.
+
+
+
+
+Additional Resources
+To automate your database backups, you may want to consider following this guide
+ written especially for (mt) Media Temple database backups. (mt) Media 
+Temple is not affiliated with this third-party website and takes no 
+responsibility for its content.
