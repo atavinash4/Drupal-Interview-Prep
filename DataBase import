@@ -1,6 +1,5 @@
 https://mediatemple.net/community/products/dv/204403864/export-and-import-mysql-databases
 
-
 Overview
 This article will show you how to export a copy of your MySQL 
 database, and how to import an SQL database backup file to your database
@@ -8,8 +7,16 @@ database, and how to import an SQL database backup file to your database
 for importing backups from other servers.
 
 
+Method: Command line
 
-Instructions
+Put the mysql.sql export inside xampp folder, then open command line/git bash there and type following commands
+
+Use your_database_name;
+SOURCE path_to_db_sql_file_on_your_local;
+
+
+
+
 Method 1 - phpMyAdmin
 Export
 Select your database from the list on the left.
